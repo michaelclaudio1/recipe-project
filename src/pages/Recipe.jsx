@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function Recipe() {
 
   let params = useParams();
   const [details, setDetails] = useState({});
   const [activeTab, setActiveTab] = useState("instructions");
+  const navigate = useNavigate();
 
   const fetchDetails = async () => {
     const data = await fetch(`https://api.spoonacular.com/recipes/${params.name}/information?apiKey=${process.env.REACT_APP_API_KEY}`);
@@ -31,7 +32,10 @@ function Recipe() {
         <Button className={activeTab === 'ingredients' ? 'active' : ''} onClick={() => setActiveTab('ingredients')}>Ingredients</Button>
         {activeTab === 'instructions' && (
           <div>
-            <p dangerouslySetInnerHTML={{ __html: details.instructions }}></p>
+            {/* SOMETIMES, THE RECIPES COME IN AN ENUMERATED LIST. THE FOLLOWING LINE MAKES
+                IT SO THE TEXT DOESN'T DISPLAY <ol><li>Sample Text</ol></li>
+            */}
+            <p dangerouslySetInnerHTML={{ __html: details.instructions }} />
           </div>
         )}
         {activeTab === 'ingredients' && (
@@ -45,6 +49,7 @@ function Recipe() {
             })}
           </ul>
         )}
+        <Button onClick={() => navigate(-1)}>Go Back</Button>
       </Info>
     </DetailWrapper>
   );
@@ -73,11 +78,15 @@ const DetailWrapper = styled.div`
 const Button = styled.button`
   padding: 1rem 2rem;
   margin-bottom: 2rem;
+  margin-top: 2rem;
   color: #313131;
   background: white;
   border: 2px solid black;
   margin-right: 2rem;
   font-weight: 600;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const Info = styled.div`
